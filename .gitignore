@@ -120,3 +120,4 @@ Thumbs.db
 # Generated files
 npm-debug.log*
 yarn-debug.log*
+frontend/

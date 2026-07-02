@@ -1,98 +1,123 @@
-# Como Utilizar o Library Rental
+# Library Rental - Guia de Utilização (Corporate Edition)
+
+## Visão Geral
+Este documento descreve como executar, configurar e utilizar a API do sistema Library Rental em ambiente de desenvolvimento.
+
+---
 
 ## Pré-requisitos
 
-- Java 25 instalado
-- Maven 3.9+ instalado
+Antes de iniciar, certifique-se de ter instalado:
 
-## Preparar o projeto
+- Java 25 ou superior
+- Maven 3.9+
+- Git (opcional, recomendado)
 
-1. Abra o terminal
-2. Execute o build:
+---
 
-```bash
-mvn -DskipTests clean package
-```
+## Build do Projeto
 
-3. Se o build for bem-sucedido, o jar será gerado em `target\library-rental-1.0.0.jar`.
-
-## Iniciar a aplicação
-
-### Via Maven
+Execute o comando abaixo para compilar o projeto:
 
 ```bash
-mvn -DskipTests spring-boot:run
+mvn clean package -DskipTests
 ```
 
-### Via JAR
+### Resultado esperado
+O artefato será gerado em:
+
+```
+target/library-rental-1.0.0.jar
+```
+
+---
+
+## Execução da Aplicação
+
+### 1. Via Maven (desenvolvimento)
 
 ```bash
-java -jar target\library-rental-1.0.0.jar
+mvn spring-boot:run -DskipTests
 ```
 
-## Usando a API
+### 2. Via JAR (produção/local)
 
-### Autenticação
+```bash
+java -jar target/library-rental-1.0.0.jar
+```
 
-1. Fazer login:
+---
+
+## Autenticação
+
+A API utiliza autenticação baseada em JWT.
+
+### Login
 
 ```http
 POST /auth/login
 Content-Type: application/json
+```
 
+```json
 {
   "username": "admin",
   "password": "admin"
 }
 ```
 
-2. Usar o token retornado no cabeçalho:
+### Uso do Token
+
+Inclua o token em todas as requisições protegidas:
 
 ```http
 Authorization: Bearer <accessToken>
 ```
 
-3. Atualizar token:
+### Refresh Token
 
 ```http
 POST /auth/refresh
 Content-Type: application/json
+```
 
+```json
 {
   "refreshToken": "<refreshToken>"
 }
 ```
 
-### Chamadas administrativas
+---
 
-- Criar autor:
+## Módulo Administrativo
+
+### Autores
+
+Criar autor:
 
 ```http
 POST /admin/authors
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "name": "Nome do Autor"
-}
 ```
 
-- Listar autores:
+Listar autores:
 
 ```http
 GET /admin/authors
-Authorization: Bearer <token>
 ```
 
-- Criar livro:
+---
+
+### Livros
+
+Criar livro:
 
 ```http
 POST /admin/books
-Authorization: Bearer <token>
-Content-Type: application/json
+```
 
+```json
 {
-  "title": "Título do Livro",
+  "title": "Example Book",
   "authorId": 1,
   "isbn": "978-1234567890",
   "copyCount": 5,
@@ -100,36 +125,33 @@ Content-Type: application/json
 }
 ```
 
-- Ajustar estoque:
+---
+
+### Estoque
+
+Atualizar estoque:
 
 ```http
 POST /admin/inventory
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "bookId": 1,
-  "branchId": 1,
-  "quantity": 3
-}
 ```
 
-- Marcar livros inutilizáveis:
+Marcar itens inutilizáveis:
 
 ```http
 POST /admin/inventory/unusable?bookId=1&branchId=1&quantity=1
-Authorization: Bearer <token>
 ```
 
-### Empréstimos de usuário
+---
 
-- Criar empréstimo:
+## Empréstimos
+
+Criar empréstimo:
 
 ```http
 POST /loans
-Authorization: Bearer <token>
-Content-Type: application/json
+```
 
+```json
 {
   "userId": 1,
   "branchId": 1,
@@ -139,33 +161,32 @@ Content-Type: application/json
 }
 ```
 
-- Devolver empréstimo:
+Devolver empréstimo:
 
 ```http
 POST /loans/return
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "loanId": 1
-}
 ```
 
-- Listar empréstimos:
+Listar empréstimos:
 
 ```http
 GET /loans
-Authorization: Bearer <token>
 ```
 
-## Verificar Swagger
+---
 
-Após iniciar a aplicação, abra:
+## Swagger
 
-- `http://localhost:8080/swagger-ui/index.html`
+Acesse a documentação interativa:
 
-## Dicas
+```
+http://localhost:8080/swagger-ui/index.html
+```
 
-- Use o Swagger para testar endpoints rapidamente.
-- Em ambiente de desenvolvimento, o banco H2 é recriado a cada inicialização.
-- Se ocorrer erro de token, gere novo login em `/auth/login`.
+---
+
+## Boas Práticas
+
+- Utilize Swagger para testes rápidos
+- Ambiente local utiliza banco em memória (H2 ou equivalente)
+- Sempre gere novo token ao expirar autenticação

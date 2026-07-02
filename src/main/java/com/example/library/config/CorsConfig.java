@@ -14,8 +14,8 @@ public class CorsConfig implements WebMvcConfigurer {
 
                 // Allowed frontend applications
                 .allowedOrigins(
-                        "http://localhost:3000", // React
-                        "http://localhost:4200"  // Angular
+                        "http://localhost:3000", // React default
+                        "http://localhost:4200"  // Angular default
                 )
 
                 // Allowed HTTP methods

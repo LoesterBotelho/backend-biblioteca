@@ -1,8 +1,8 @@
 INSERT INTO role (name) VALUES ('ROLE_ADMIN');
 INSERT INTO role (name) VALUES ('ROLE_USER');
 
-INSERT INTO app_user (username, password, full_name, enabled) VALUES ('admin', '$2a$10$7q0v0Jm0qQzqYw8d1rKqUe0Q7mZ7sZfQp1f1oJb0l8QeQm2g0m8x2', 'Administrator', TRUE);
-INSERT INTO app_user (username, password, full_name, enabled) VALUES ('student1', '$2a$10$N9k8v2pX9cQw3mR8tY1fQeK0aZpL7sD8vB2nH5xC9mQ1eR6tY7uI0', 'Student One', TRUE);
+INSERT INTO app_user (username, password, full_name, enabled) VALUES ('admin', '$2a$10$r.onnlwQHsdFcNZSOu7ZYOvkc5i9o8MVlpiaU9U6MxCWyon0eXXzK', 'Administrator', TRUE);
+INSERT INTO app_user (username, password, full_name, enabled) VALUES ('student1', '$2a$10$r.onnlwQHsdFcNZSOu7ZYOvkc5i9o8MVlpiaU9U6MxCWyon0eXXzK', 'Student One', TRUE);
 
 INSERT INTO user_role (user_id, role_id) VALUES (1, 1);
 INSERT INTO user_role (user_id, role_id) VALUES (2, 2);
