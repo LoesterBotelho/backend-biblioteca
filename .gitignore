@@ -121,3 +121,4 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 frontend/
+bin/
