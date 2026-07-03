@@ -35,35 +35,71 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
+        System.out.println("\n================ JWT FILTER ================");
+        System.out.println("URI: " + request.getRequestURI());
+        System.out.println("METHOD: " + request.getMethod());
+
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            System.out.println("OPTIONS request -> bypass filter");
             filterChain.doFilter(request, response);
             return;
         }
 
         String token = jwtTokenProvider.resolveToken(request);
 
-        if (token != null && jwtTokenProvider.validateToken(token)) {
+        System.out.println("TOKEN PRESENT: " + (token != null));
 
-            String username = jwtTokenProvider.getUsername(token);
-
-            UserDetails userDetails =
-                    userDetailsService.loadUserByUsername(username);
-
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-
-            authentication.setDetails(
-                    new WebAuthenticationDetailsSource()
-                            .buildDetails(request)
-            );
-
-            SecurityContextHolder.getContext()
-                    .setAuthentication(authentication);
+        if (token != null) {
+            System.out.println("TOKEN (partial): " +
+                    token.substring(0, Math.min(20, token.length())) + "...");
         }
+
+        try {
+            if (token != null && jwtTokenProvider.validateToken(token)) {
+
+                System.out.println("TOKEN VALID: true");
+
+                String username = jwtTokenProvider.getUsername(token);
+                System.out.println("USERNAME FROM TOKEN: " + username);
+
+                UserDetails userDetails =
+                        userDetailsService.loadUserByUsername(username);
+
+                System.out.println("USER LOADED: " + userDetails.getUsername());
+
+                System.out.println("AUTHORITIES:");
+                userDetails.getAuthorities()
+                        .forEach(a -> System.out.println(" - " + a.getAuthority()));
+
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+
+                authentication.setDetails(
+                        new WebAuthenticationDetailsSource()
+                                .buildDetails(request)
+                );
+
+                SecurityContextHolder.getContext()
+                        .setAuthentication(authentication);
+
+                System.out.println("AUTH SET IN SECURITY CONTEXT");
+            } else {
+                System.out.println("TOKEN INVALID OR NULL");
+            }
+
+        } catch (Exception e) {
+            System.out.println("ERROR IN JWT FILTER: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        System.out.println("CURRENT AUTH: " +
+                SecurityContextHolder.getContext().getAuthentication());
+
+        System.out.println("===========================================\n");
 
         filterChain.doFilter(request, response);
     }
@@ -73,10 +109,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        return
-                path.startsWith("/api/v1/auth/")
-                || path.startsWith("/swagger-ui")
-                || path.startsWith("/v3/api-docs")
-                || path.startsWith("/h2-console");
+        boolean skip =
+                path.startsWith("/api/v1/auth/") ||
+                path.startsWith("/swagger-ui") ||
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/h2-console");
+
+        if (skip) {
+            System.out.println("SKIP FILTER FOR: " + path);
+        }
+
+        return skip;
     }
 }
